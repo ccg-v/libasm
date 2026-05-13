@@ -7,60 +7,39 @@ extern  malloc
 section .text
 
 ft_strdup:
-	; ----------------------------
-	; Preserve callee-saved regs
-	; ----------------------------
 	push rbx
 	push r12
 
-	; ----------------------------
-	; rbx = original string (s1)
-	; ----------------------------
 	mov rbx, rdi
 
-	; ----------------------------
-	; length = ft_strlen(s1)
-	; ----------------------------
-	call ft_strlen WRT ..plt		; rax = length
+	call ft_strlen WRT ..plt
 
-	inc rax					; +1 for '\0'
+	inc rax
 
-	; ----------------------------
-	; malloc(length + 1)
-	; ----------------------------
 	mov rdi, rax
 	call malloc WRT ..plt
 
-	; ----------------------------
-	; check malloc result
-	; ----------------------------
-	test rax, rax
-	je .fail
+	cmp rax, 0		; test rax, rax
+	jz .fail
 
-	; ----------------------------
-	; save allocated pointer
-	; ----------------------------
 	mov r12, rax
 
-	; ----------------------------
-	; setup copy pointers
-	; ----------------------------
-	mov rsi, rbx            ; source
-	mov rdi, r12            ; destination
+	mov rsi, rbx
+	mov rdi, r12
 
 .copy_loop:
-	mov dl, [rsi]          ; 1-byte register NOT tied to rax
+	mov dl, [rsi]
 	mov [rdi], dl
 
-	test dl, dl
-	je .done
+	cmp dl, 0		; test dl, dl
+	jz .done
 
 	inc rsi
 	inc rdi
 	jmp .copy_loop
 
 .done:
-	mov rax, r12            ; return malloc pointer
+	mov rax, r12
 
 	pop r12
 	pop rbx
